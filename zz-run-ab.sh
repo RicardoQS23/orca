@@ -9,8 +9,10 @@ git fetch -q origin
 free -m; nproc; uptime
 test=src/main/native-chat/agent-session-journal/database/zz-checkpoint-pressure.local.test.ts
 churn() { while [ -f "$root/churn" ]; do dd if=/dev/zero of="$root/churn.bin" bs=1M count=2048 conv=fsync status=none; cat "$root/churn.bin" >/dev/null; rm -f "$root/churn.bin"; done; }
-for round in $(seq 1 "${BENCH_ROUNDS:-2}"); do
-  for arm in base head; do
+round=0
+for arm in ${BENCH_ARMS:-base head base head}; do
+  round=$((round+1))
+  {
     sha=$BENCH_BASE; [ "$arm" = head ] && sha=$BENCH_HEAD
     git checkout -q --detach -f "$sha" || exit 91
     cp "$kit/zz-checkpoint-pressure.local.test.ts" "$test"
@@ -24,7 +26,7 @@ for round in $(seq 1 "${BENCH_ROUNDS:-2}"); do
     rm -f "$root/churn"; wait $churner
     awk 'NR%10==0' "$root/result.jsonl" | sed "s/^/SAMPLE $arm$round /"
     rm -rf "$root" "$test"
-  done
+  }
 done
 git checkout -q --detach -f "$orig"
 rm -rf "$kit"
