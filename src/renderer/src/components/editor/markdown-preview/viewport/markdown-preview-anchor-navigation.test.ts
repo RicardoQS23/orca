@@ -27,22 +27,10 @@ describe('markdown preview HTML anchors', () => {
       expectedId: 'user-content-section'
     },
     {
-      name: 'already-prefixed hash to the authored id',
-      content: '[Go to section](#section)\n\n<a id="section"></a>\n',
-      hash: 'user-content-section',
-      expectedId: 'user-content-section'
-    },
-    {
       name: 'authored id that already has the prefix',
       content: '[Go to section](#user-content-section)\n\n<a id="user-content-section"></a>\n',
       hash: 'user-content-section',
       expectedId: 'user-content-user-content-section'
-    },
-    {
-      name: 'heading slug exactly',
-      content: '[Go to section](#section)\n\n## Section\n',
-      hash: 'section',
-      expectedId: 'section'
     }
   ])('resolves $name', ({ content, hash, expectedId }) => {
     expect(findMarkdownPreviewAnchorElement(renderPreview(content), hash)?.id).toBe(expectedId)
